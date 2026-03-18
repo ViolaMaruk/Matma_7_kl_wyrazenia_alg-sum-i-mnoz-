@@ -194,7 +194,7 @@
             // ZADANIE 2
             { type: "single", text: "Zapisz w jak najprostszej postaci: <br><br><span class='equation'>4(3x - 2) + 5(2 - x)</span>", hint: "Rozwiń nawiasy, a potem zredukuj wyrazy podobne.", answers: ["7x+2", "2+7x"] },
             { type: "single", text: "Zapisz w jak najprostszej postaci: <br><br><span class='equation'>3(4x + 1) - 2(x - 5)</span>", hint: "Uważaj przy drugim nawiasie: -2 * (-5) = +10.", answers: ["10x+13", "13+10x"] },
-            { type: "single", text: "Zapisz w jak najprostszej postaci: <br><br><span class='equation'>-3x(4 - x) - 2(x<sup>2</sup> + 5x)</span>", hint: "Wynik to только iksy w kwadracie i zwykłe iksy.", answers: ["x^2-22x", "1x^2-22x", "-22x+x^2"] },
+            { type: "single", text: "Zapisz w jak najprostszej postaci: <br><br><span class='equation'>-3x(4 - x) - 2(x<sup>2</sup> + 5x)</span>", hint: "Wynik to tylko iksy w kwadracie i zwykłe iksy.", answers: ["x^2-22x", "1x^2-22x", "-22x+x^2"] },
             { type: "single", text: "Zapisz w jak najprostszej postaci: <br><br><span class='equation'>4(2 - 3x) - (5x + 1) &middot; 2</span>", hint: "Mnożenie przez 2 z tyłu nawiasu działa tak samo, jakby było z przodu.", answers: ["-22x+6", "6-22x"] },
 
             // ZADANIE 4 (Podwójne pola - Uprość + Oblicz)
@@ -222,7 +222,7 @@
             { 
                 type: "double", 
                 text: "<b>Zapisz w jak najprostszej postaci i oblicz wartość</b> dla x = 3 i y = -2.<br><br><span class='equation'>-(x<sup>2</sup> - 4xy) - (3y - 2x<sup>2</sup>) + (-2xy + y)</span>", 
-                hint: "Uważaj na znaki. -(-2x^2) to 2x^2. Od tego odejmujemy x^2 z pierwszego nawiasu.", 
+                hint: "Uważaj на znaki. -(-2x^2) to 2x^2. Od tego odejmujemy x^2 z pierwszego nawiasu.", 
                 answers1: ["x^2+2xy-2y", "1x^2+2xy-2y", "2xy+x^2-2y", "-2y+x^2+2xy", "x^2-2y+2xy"], 
                 answers2: ["1"] 
             }
@@ -234,7 +234,6 @@
             const taskNum = index + 1;
 
             if (task.type === "double") {
-                // Generowanie dla zadań z dwoma polami (Zadanie 4)
                 resultsData[`${taskNum}_1`] = "Nie rozwiązano"; 
                 resultsData[`${taskNum}_2`] = "Nie rozwiązano"; 
 
@@ -272,7 +271,6 @@
                     </div>
                 `;
             } else {
-                // Generowanie dla zadań ze zwykłym, pojedynczym polem
                 resultsData[`${taskNum}`] = "Nie rozwiązano"; 
                 const answersJson = JSON.stringify(task.answers).replace(/"/g, "'");
                 const firstAnswer = task.answers[0];
@@ -300,8 +298,14 @@
             let feedbackEl = document.getElementById(feedbackId);
             let btnAnswer = document.getElementById(btnAnswerId);
 
-            // ТУТ ГЛАВНОЕ ИЗМЕНЕНИЕ: удаляем все пробелы И звездочки перед проверкой
-            let normalized = userInput.replace(/[\s*]/g, '').toLowerCase().replace(',', '.');
+            // СУПЕР-УМНАЯ ОЧИСТКА ВВОДА:
+            let normalized = userInput
+                .replace(/[\s*]/g, '')        // удаляем пробелы и звездочки
+                .toLowerCase()                // всё в нижний регистр
+                .replace(',', '.')            // запятые меняем на точки
+                .replace(/[–—−]/g, '-')       // любые тире и дефисы с телефона меняем на стандартный минус
+                .replace(/^\+/, '');          // если в самом начале есть +, мы его игнорируем (e.g. +6p-12 -> 6p-12)
+
             if (normalized === "") return (feedbackEl.textContent = "Wpisz odpowiedź!", feedbackEl.className = "feedback incorrect");
 
             if (userAttempts[inputId] === undefined) userAttempts[inputId] = new Set();
